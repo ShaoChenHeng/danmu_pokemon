@@ -31,12 +31,13 @@ async def printer(q, redis):
         m = await q.get()
         
         if m['msg_type'] == 'danmaku':
-            
+
             print(m["content"])
-            m["content"].replace("上", 'w')
-            m["content"].replace("下", 's')
-            m["content"].replace("左", 'a')
-            m["content"].replace("右", 'd')
+            m["content"] = m["content"].replace("前", 'wq')
+            m["content"] = m["content"].replace("后", 'sq')
+            m["content"] = m["content"].replace('左', 'aq')
+            m["content"] = m["content"].replace("右", 'dq')
+            
             print(f'{m["name"]}：{m["content"]}')
             list_str = list(m["content"])
             
@@ -59,6 +60,23 @@ async def printer(q, redis):
             elif m["content"] == 'enter':
                 redis.rpush(list_name, 'enter')
                 
+            elif m["content"][0] == 'L' and \
+                 m["content"][1] == 'L':
+                if len(m["content"]) == 2:
+                    new_str = m["content"] + '0'
+                    redis.rpush(list_name, new_str)
+                elif len(m["content"]) == 3 and \
+                     '0' <= m["content"][2] <= '9':
+                    redis.rpush(list_name, m["content"])
+                    
+            elif m["content"][0] == 'R' and \
+                 m["content"][1] == 'R':
+                if len(m["content"]) == 2:
+                    new_str = m["content"] + '0'
+                    redis.rpush(list_name, new_str)
+                elif len(m["content"]) == 3 and \
+                     '0' <= m["content"][2] <= '9':
+                    redis.rpush(list_name, m["content"])
             else:
                 print("弹幕拆分:", list_str)
                 list_str = direction_number(list_str)
